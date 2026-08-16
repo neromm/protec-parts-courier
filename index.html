@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="theme-color" content="#071727" />
+  <title>ProTec - مندوب قطع الغيار</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; min-height: 100%; }
+    body {
+      background: #020a13;
+      color: #f4f7fb;
+      font-family: Arial, Tahoma, sans-serif;
+    }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(7, 23, 39, .97);
+      border-bottom: 1px solid #173149;
+      padding: 14px 16px;
+      backdrop-filter: blur(8px);
+    }
+    .brand {
+      font-size: 28px;
+      font-weight: 900;
+      color: #4f8dff;
+      letter-spacing: .3px;
+    }
+    .brand-sub {
+      color: #98aabc;
+      font-size: 13px;
+      margin-top: 2px;
+    }
+    .wrap {
+      width: min(100%, 720px);
+      margin: 0 auto;
+      padding: 16px;
+    }
+    .card {
+      background: #071727;
+      border: 1px solid #173149;
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.17);
+    }
+    .vehicle {
+      background: linear-gradient(135deg, #0c2944, #071727);
+      border-color: #194b74;
+    }
+    .vehicle-name {
+      font-size: 23px;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+    .meta {
+      color: #b8c7d3;
+      margin-top: 5px;
+      line-height: 1.5;
+    }
+    .status-pill {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: #102943;
+      color: #a8c9ff;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .status-completed {
+      background: #073821;
+      color: #64efa8;
+      border: 1px solid #0b6840;
+    }
+    .part-head {
+      display: flex;
+      gap: 11px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .part-num {
+      width: 38px;
+      height: 38px;
+      min-width: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: #1268ff;
+      color: white;
+      font-weight: 900;
+      font-size: 17px;
+    }
+    .part-name {
+      font-size: 20px;
+      font-weight: 900;
+    }
+    .qty {
+      color: #9fb0bf;
+      margin-top: 3px;
+      font-size: 14px;
+    }
+    .workshop-note {
+      background: #0c253a;
+      color: #d4e0ea;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 13px;
+      line-height: 1.6;
+    }
+    .workshop-note b {
+      display: block;
+      color: #77a9ff;
+      font-size: 13px;
+      margin-bottom: 3px;
+    }
+    label {
+      display: block;
+      margin: 13px 2px 6px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    input, select, textarea {
+      width: 100%;
+      color: #fff;
+      background: #020d18;
+      border: 1px solid #294760;
+      border-radius: 12px;
+      padding: 13px;
+      font-size: 16px;
+      font-family: inherit;
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #347cff;
+      box-shadow: 0 0 0 2px rgba(52,124,255,.12);
+    }
+    textarea { min-height: 78px; resize: vertical; }
+    .price-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .currency {
+      white-space: nowrap;
+      color: #c7d4df;
+      font-weight: 800;
+    }
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 15px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .save-btn {
+      background: #1268ff;
+      color: white;
+    }
+    .finish-btn {
+      background: #08c96d;
+      color: #02140c;
+    }
+    button:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+    .result {
+      min-height: 20px;
+      text-align: center;
+      margin-top: 8px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .ok { color: #59efa0; }
+    .err { color: #ff6b77; }
+    .loading {
+      padding: 34px 18px;
+      text-align: center;
+      color: #a9bac8;
+    }
+    .spinner {
+      width: 38px;
+      height: 38px;
+      border: 4px solid #173149;
+      border-top-color: #347cff;
+      border-radius: 50%;
+      margin: 0 auto 12px;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error-card {
+      text-align: center;
+      padding: 28px 18px;
+    }
+    .error-icon {
+      font-size: 42px;
+      margin-bottom: 10px;
+    }
+    .error-title {
+      font-size: 21px;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+    .muted {
+      color: #9fb0bf;
+      line-height: 1.7;
+    }
+    .section-title {
+      font-size: 19px;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+    .section-sub {
+      color: #97aabc;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+    .footer {
+      color: #5f7488;
+      text-align: center;
+      font-size: 12px;
+      padding: 4px 0 28px;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">ProTec</div>
+    <div class="brand-sub">مندوب قطع الغيار</div>
+  </header>
+
+  <main id="app" class="wrap">
+    <div class="card loading">
+      <div class="spinner"></div>
+      جارٍ تحميل طلب قطع الغيار...
+    </div>
+  </main>
+
+  <script>
+    const API_URL =
+      "https://dbhfsqfdiduedehdseww.supabase.co/functions/v1/parts-courier";
+
+    const params = new URLSearchParams(window.location.search);
+    const token = (params.get("token") || "").trim();
+    let currentItemIds = [];
+
+    function validUuid(v) {
+      return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v);
+    }
+
+    function esc(v) {
+      return String(v ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    async function api(body) {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+        body: JSON.stringify(body),
+      });
+
+      let data;
+      try {
+        data = await response.json();
+      } catch (_) {
+        throw new Error("رد غير صالح من الخادم");
+      }
+
+      if (!response.ok || data.ok !== true) {
+        throw new Error(data.error || "حدث خطأ في الاتصال");
+      }
+
+      return data;
+    }
+
+    function showError(title, message) {
+      document.getElementById("app").innerHTML = `
+        <section class="card error-card">
+          <div class="error-icon">🔧</div>
+          <div class="error-title">${esc(title)}</div>
+          <div class="muted">${esc(message)}</div>
+        </section>
+        <div class="footer">ProTec Parts Courier</div>
+      `;
+    }
+
+    function statusLabel(status) {
+      switch (status) {
+        case "sent": return "تم الإرسال للمندوب";
+        case "viewed": return "تم فتح الطلب";
+        case "priced": return "تم إدخال بيانات";
+        case "completed": return "تم إنهاء الطلب";
+        default: return "طلب قطع غيار";
+      }
+    }
+
+    function renderRequest(request) {
+      const items = Array.isArray(request.items) ? request.items : [];
+      const completed = request.status === "completed";
+      currentItemIds = items.map((item) => String(item.id));
+
+      let html = `
+        <section class="card vehicle">
+          <div class="vehicle-name">${esc(request.vehicle_name)}</div>
+          <div class="meta">رقم الملف: <strong>${esc(request.vehicle_file_no)}</strong></div>
+          <div class="status-pill ${completed ? "status-completed" : ""}">
+            ${completed ? "✓ " : ""}${esc(statusLabel(request.status))}
+          </div>
+        </section>
+      `;
+
+      if (items.length === 0) {
+        html += `
+          <section class="card error-card">
+            <div class="muted">لا توجد قطع غيار في هذا الطلب.</div>
+          </section>
+        `;
+      }
+
+      items.forEach((item, index) => {
+        const id = esc(item.id);
+        const availability = String(item.availability || "searching");
+
+        html += `
+          <section class="card">
+            <div class="part-head">
+              <div class="part-num">${index + 1}</div>
+              <div>
+                <div class="part-name">${esc(item.part_name)}</div>
+                <div class="qty">الكمية: ${esc(item.quantity)}</div>
+              </div>
+            </div>
+
+            ${item.part_note ? `
+              <div class="workshop-note">
+                <b>ملاحظة الورشة</b>
+                ${esc(item.part_note)}
+              </div>
+            ` : ""}
+
+            <label for="supplier-${id}">اسم المورد / المحل</label>
+            <input
+              id="supplier-${id}"
+              type="text"
+              value="${esc(item.supplier_name || "")}"
+              placeholder="اكتب اسم المورد أو المحل"
+              ${completed ? "disabled" : ""}
+            />
+
+            <label for="location-${id}">موقع المورد</label>
+            <input
+              id="location-${id}"
+              type="text"
+              value="${esc(item.supplier_location || "")}"
+              placeholder="مثال: الزنتان - طرابلس"
+              ${completed ? "disabled" : ""}
+            />
+
+            <label for="price-${id}">سعر القطعة الواحدة</label>
+            <div class="price-row">
+              <input
+                id="price-${id}"
+                type="number"
+                min="0"
+                step="0.01"
+                inputmode="decimal"
+                value="${esc(item.supplier_price ?? "")}"
+                placeholder="0.00"
+                ${completed ? "disabled" : ""}
+              />
+              <div class="currency">د.ل</div>
+            </div>
+
+            <label for="availability-${id}">حالة التوفر</label>
+            <select id="availability-${id}" ${completed ? "disabled" : ""}>
+              <option value="searching" ${availability === "searching" ? "selected" : ""}>جاري البحث</option>
+              <option value="available" ${availability === "available" ? "selected" : ""}>متوفرة</option>
+              <option value="unavailable" ${availability === "unavailable" ? "selected" : ""}>غير متوفرة</option>
+            </select>
+
+            <label for="note-${id}">ملاحظة المندوب</label>
+            <textarea
+              id="note-${id}"
+              placeholder="ملاحظة اختيارية"
+              ${completed ? "disabled" : ""}
+            >${esc(item.courier_note || "")}</textarea>
+
+            <button
+              id="btn-${id}"
+              class="save-btn"
+              onclick="saveItem('${id}')"
+              ${completed ? "disabled" : ""}
+            >
+              ${completed ? "تم إنهاء الطلب" : "حفظ هذه القطعة"}
+            </button>
+
+            <div id="result-${id}" class="result"></div>
+          </section>
+        `;
+      });
+
+      html += `
+        <section class="card">
+          <div class="section-title">إنهاء الطلب</div>
+          <div class="section-sub">
+            عند الضغط على إنهاء الطلب سيتم حفظ جميع القطع تلقائيًا ثم إرسال النتيجة للورشة.
+          </div>
+
+          <label for="request-note">ملاحظة عامة على الطلب</label>
+          <textarea
+            id="request-note"
+            placeholder="ملاحظة عامة اختيارية"
+            ${completed ? "disabled" : ""}
+          >${esc(request.courier_note || "")}</textarea>
+
+          <button
+            id="finish-btn"
+            class="finish-btn"
+            onclick="finishRequest()"
+            ${completed ? "disabled" : ""}
+          >
+            ${completed ? "✓ تم إنهاء الطلب" : "إنهاء الطلب وإرساله للورشة"}
+          </button>
+
+          <div id="finish-result" class="result"></div>
+        </section>
+
+        <div class="footer">ProTec Parts Courier</div>
+      `;
+
+      document.getElementById("app").innerHTML = html;
+    }
+
+    async function loadRequest() {
+      if (!validUuid(token)) {
+        showError("رابط غير صالح", "رابط طلب قطع الغيار غير صحيح أو ناقص.");
+        return;
+      }
+
+      try {
+        const data = await api({
+          action: "get_request_json",
+          token,
+        });
+        renderRequest(data.request);
+      } catch (error) {
+        showError("تعذر فتح الطلب", error.message);
+      }
+    }
+
+    async function saveItemData(id, showMessage = true) {
+      const btn = document.getElementById("btn-" + id);
+      const result = document.getElementById("result-" + id);
+
+      if (btn) btn.disabled = true;
+
+      if (showMessage && result) {
+        result.className = "result";
+        result.textContent = "جارٍ الحفظ...";
+      }
+
+      try {
+        await api({
+          action: "update_item",
+          token,
+          item_id: id,
+          supplier_name: document.getElementById("supplier-" + id).value,
+          supplier_location: document.getElementById("location-" + id).value,
+          supplier_price: document.getElementById("price-" + id).value,
+          availability: document.getElementById("availability-" + id).value,
+          courier_note: document.getElementById("note-" + id).value,
+        });
+
+        if (showMessage && result) {
+          result.className = "result ok";
+          result.textContent = "✓ تم حفظ بيانات القطعة";
+        }
+
+        return true;
+      } catch (error) {
+        if (result) {
+          result.className = "result err";
+          result.textContent = "تعذر الحفظ: " + error.message;
+        }
+        throw error;
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    async function saveItem(id) {
+      try {
+        await saveItemData(id, true);
+      } catch (_) {
+        // رسالة الخطأ تظهر داخل بطاقة القطعة.
+      }
+    }
+
+    async function finishRequest() {
+      if (!confirm("سيتم حفظ جميع القطع أولاً ثم إنهاء الطلب. هل تريد المتابعة؟")) {
+        return;
+      }
+
+      const btn = document.getElementById("finish-btn");
+      const result = document.getElementById("finish-result");
+
+      btn.disabled = true;
+      result.className = "result";
+      result.textContent = "جارٍ حفظ جميع القطع...";
+
+      try {
+        for (let i = 0; i < currentItemIds.length; i++) {
+          const id = currentItemIds[i];
+          result.textContent =
+            "جارٍ حفظ القطع... " + (i + 1) + " / " + currentItemIds.length;
+
+          await saveItemData(id, false);
+        }
+
+        result.textContent = "تم حفظ جميع القطع، جارٍ إنهاء الطلب...";
+
+        await api({
+          action: "finish_request",
+          token,
+          courier_note: document.getElementById("request-note").value,
+        });
+
+        result.className = "result ok";
+        result.textContent = "✓ تم حفظ جميع القطع وإنهاء الطلب وإرساله للورشة";
+
+        setTimeout(() => {
+          window.location.reload();
+        }, 900);
+      } catch (error) {
+        result.className = "result err";
+        result.textContent =
+          "لم يتم إنهاء الطلب لأن إحدى القطع لم تُحفظ: " + error.message;
+        btn.disabled = false;
+      }
+    }
+
+    loadRequest();
+  </script>
+</body>
+</html>
