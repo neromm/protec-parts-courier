@@ -252,6 +252,7 @@
     const params = new URLSearchParams(window.location.search);
     const token = (params.get("token") || "").trim();
     let currentItemIds = [];
+    let supplierCatalog = [];
 
     function validUuid(v) {
       return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v);
@@ -309,7 +310,57 @@
       }
     }
 
-    function renderRequest(request) {
+    function supplierFieldHtml(id, currentName, completed) {
+      const current = String(currentName || "");
+      if (!supplierCatalog.length) {
+        return `
+          <input
+            id="supplier-${id}"
+            type="text"
+            value="${esc(current)}"
+            placeholder="اكتب اسم المورد أو المحل"
+            ${completed ? "disabled" : ""}
+          />
+        `;
+      }
+
+      const known = supplierCatalog.some(
+        (supplier) => String(supplier.name || "") === current
+      );
+
+      let options = `<option value="">-- اختر المورد --</option>`;
+      if (current && !known) {
+        options += `<option value="${esc(current)}" data-location="" selected>${esc(current)}</option>`;
+      }
+      supplierCatalog.forEach((supplier) => {
+        const name = String(supplier.name || "");
+        const location = String(supplier.location || "");
+        const selected = name === current ? "selected" : "";
+        const label = location ? name + " — " + location : name;
+        options += `<option value="${esc(name)}" data-location="${esc(location)}" ${selected}>${esc(label)}</option>`;
+      });
+
+      return `
+        <select
+          id="supplier-${id}"
+          onchange="supplierChanged('${id}')"
+          ${completed ? "disabled" : ""}
+        >${options}</select>
+      `;
+    }
+
+    function supplierChanged(id) {
+      const field = document.getElementById("supplier-" + id);
+      const location = document.getElementById("location-" + id);
+      if (!field || !location) return;
+      const option = field.options ? field.options[field.selectedIndex] : null;
+      if (!option) return;
+      const supplierLocation = option.dataset.location || "";
+      if (supplierLocation) location.value = supplierLocation;
+    }
+
+    function renderRequest(request, suppliers = []) {
+      supplierCatalog = Array.isArray(suppliers) ? suppliers : [];
       const items = Array.isArray(request.items) ? request.items : [];
       const completed = request.status === "completed";
       currentItemIds = items.map((item) => String(item.id));
@@ -354,13 +405,7 @@
             ` : ""}
 
             <label for="supplier-${id}">اسم المورد / المحل</label>
-            <input
-              id="supplier-${id}"
-              type="text"
-              value="${esc(item.supplier_name || "")}"
-              placeholder="اكتب اسم المورد أو المحل"
-              ${completed ? "disabled" : ""}
-            />
+            ${supplierFieldHtml(id, item.supplier_name || "", completed)}
 
             <label for="location-${id}">موقع المورد</label>
             <input
@@ -457,7 +502,7 @@
           action: "get_request_json",
           token,
         });
-        renderRequest(data.request);
+        renderRequest(data.request, data.suppliers || []);
       } catch (error) {
         showError("تعذر فتح الطلب", error.message);
       }
